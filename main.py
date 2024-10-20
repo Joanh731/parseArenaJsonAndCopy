@@ -58,23 +58,33 @@ def print_colored(text, color='blue'):
 
 
 if __name__ == '__main__':
-    json_file_path = '.\\arena_000_int\\level.json'  # JSON 文件路径
+    json_file_path = '.\\arena_000_int\\level.SCNE'  # JSON 文件路径
     source_folder_path = '.\\arena_000_int'  # 源文件夹路径
     destination_folder_path = '.\\copy'  # 目标文件夹路径
 
     print_colored('开始加载json文件')
     all_keys_and_values = []
 
-    with open(json_file_path, 'r', encoding='utf-8') as file:
-        data = json.load(file)  # 解析 JSON 数据
-        extract_strings(data, all_keys_and_values)  # 提取所有键和值
-    print_colored('加载完毕，开始处理json文件')
+    # 读取文件内容
+    with open(json_file_path, "r", encoding="utf-8") as file:
+        content = file.read()
 
-    stripped_strings = [s.rsplit('.', 1)[0] for s in tqdm(all_keys_and_values, desc='删除文件中的字符串后缀') if
-                        '.' in s]
+    # 为内容添加大括号
+    fixed_content = "{" + content + "}"
+    # 解析为JSON
+    try:
+        json_data = json.loads(fixed_content)  # 解析 JSON 数据
+        print("JSON数据:", json_data)
+        extract_strings(json_data, all_keys_and_values)  # 提取所有键和值
+        print_colored('加载完毕，开始处理json文件')
 
-    print_colored('处理完毕，开始过滤文件')
+        stripped_strings = [s.rsplit('.', 1)[0] for s in tqdm(all_keys_and_values, desc='删除文件中的字符串后缀') if
+                            '.' in s]
 
-    copy_files_with_prefix(source_folder_path, destination_folder_path, stripped_strings)  # 复制文件
+        print_colored('处理完毕，开始过滤文件')
 
-    os.system('pause')
+        copy_files_with_prefix(source_folder_path, destination_folder_path, stripped_strings)  # 复制文件
+
+        os.system('pause')
+    except json.JSONDecodeError as e:
+        print(f"JSON解析错误: {e}")
