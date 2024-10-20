@@ -58,9 +58,9 @@ def print_colored(text, color='blue'):
 
 
 if __name__ == '__main__':
-    json_file_path = 'C:\\Users\\l4486\\Desktop\\file\\arena_000_int\\level.json'  # JSON 文件路径
-    source_folder_path = 'C:\\Users\\l4486\\Desktop\\file\\arena_000_int'  # 源文件夹路径
-    destination_folder_path = 'C:\\Users\\l4486\\Desktop\\file\\copy'  # 目标文件夹路径
+    json_file_path = '.\\arena_000_int\\level.json'  # JSON 文件路径
+    source_folder_path = '.\\arena_000_int'  # 源文件夹路径
+    destination_folder_path = '.\\copy'  # 目标文件夹路径
 
     print_colored('开始加载json文件')
     all_keys_and_values = []
