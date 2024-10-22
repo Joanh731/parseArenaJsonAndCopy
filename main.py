@@ -98,17 +98,14 @@ def multi_thread_copy(file_list, dst_dir, max_workers=10):
 
 def extract_strings(obj, result_list):
     if isinstance(obj, dict):
-        for value in obj.values():
-            extract_strings(value, result_list)  # 递归处理值
+        for key, value in obj.items():
+            if isinstance(key, str) and (key == "Binary" or key == "Script"):
+                result_list.append(value)
+            else:
+                extract_strings(value, result_list)  # 递归处理值
     elif isinstance(obj, list):
         for item in obj:
             extract_strings(item, result_list)  # 递归处理列表中的每个项
-    elif isinstance(obj, str):
-        result_list.append(obj)  # 添加字符串
-    # 修改为只提取字典的值
-    elif isinstance(obj, dict):
-        for value in obj.values():
-            result_list.append(value)  # 直接添加字典的值
 
 
 # 遍历文件夹并复制特定文件
