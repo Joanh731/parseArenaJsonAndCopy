@@ -41,6 +41,7 @@ def multi_thread_copy(file_list, dst_dir, max_workers=10):
             for future in futures:
                 future.result()
 
+
 # # 自定义拷贝文件函数
 # def copy_file(src, dst):
 #     try:
@@ -98,17 +99,12 @@ def multi_thread_copy(file_list, dst_dir, max_workers=10):
 
 def extract_strings(obj, result_list):
     if isinstance(obj, dict):
-        for value in obj.values():
-            extract_strings(value, result_list)  # 递归处理值
-    elif isinstance(obj, list):
-        for item in obj:
-            extract_strings(item, result_list)  # 递归处理列表中的每个项
-    elif isinstance(obj, str):
-        result_list.append(obj)  # 添加字符串
-    # 修改为只提取字典的值
-    elif isinstance(obj, dict):
-        for value in obj.values():
-            result_list.append(value)  # 直接添加字典的值
+        for key, value in obj.items():
+            if isinstance(key, str) and (key.__eq__("Script") or key.__eq__("Binary")):
+                print(value)
+                result_list.append(value)
+            else:
+                extract_strings(value, result_list)  # 递归处理值
 
 
 # 遍历文件夹并复制特定文件
@@ -159,29 +155,36 @@ if __name__ == '__main__':
     source_folder_path = '.\\arena_000_int'  # 源文件夹路径
     destination_folder_path = '.\\copy'  # 目标文件夹路径
 
-    print_colored('开始加载json文件')
-    all_keys_and_values = []
+    # 打开并读取文件
+    with open(json_file_path, 'r') as file:
+        lines = file.readlines()
+
+    # 用于存储提取的结果
+    extracted_values = []
+
+    # 处理每一行
+    for line in lines:
+        # 去掉行首空白
+        line = line.lstrip()
+        # 检查是否包含 "Script" 或 "Binary"
+        if '"Script"' in line or '"Binary"' in line:
+            # 提取引号中的内容
+            value = line.split(':')[-1].strip().strip('"')
+            # 去掉后缀
+            value = value.rsplit('.', 1)[0]  # 去掉最后一个点及其后的部分
+            extracted_values.append(value)
+
+    # 保存提取的内容到 source.txt
+    with open('source.txt', 'w') as output_file:
+        for item in extracted_values:
+            output_file.write(f"{item}\n")
+
+    print("提取的内容已保存到 source.txt 中。")
 
     # 读取文件内容
-    with open(json_file_path, "r", encoding="utf-8") as file:
-        content = file.read()
+    with open('.\\source.txt', "r", encoding="utf-8") as file:
+        all_keys_and_values = [line.strip() for line in file.readlines()]
 
-    # 为内容添加大括号
-    fixed_content = "{" + content + "}"
-    # 解析为JSON
-    try:
-        json_data = json.loads(fixed_content)  # 解析 JSON 数据
-        extract_strings(json_data, all_keys_and_values)  # 提取所有键和值
-        print_colored('加载完毕，开始处理json文件')
+    print(all_keys_and_values)
 
-        stripped_strings = [s.rsplit('.', 1)[0]
-                            for s in tqdm(all_keys_and_values, desc=Fore.GREEN + '删除文件中的字符串后缀') if
-                            '.' in s]
-
-        print_colored('处理完毕，开始过滤文件')
-
-        copy_files_with_prefix(source_folder_path, destination_folder_path, stripped_strings)  # 复制文件
-
-        os.system('pause')
-    except json.JSONDecodeError as e:
-        print(f"JSON解析错误: {e}")
+    copy_files_with_prefix(source_folder_path, destination_folder_path, all_keys_and_values)  # 复制文件
