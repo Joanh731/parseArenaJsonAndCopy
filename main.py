@@ -16,8 +16,10 @@ def copy_file(src, dst, progress_bar):
         return f"复制文件 {src} 时出错: {e}"
 
 
-# 使用线程池并显示每个线程的进度
 def multi_thread_copy(file_list, dst_dir, max_workers=10):
+    """
+    使用线程池并显示每个线程的进度
+    """
     # 确保目标目录存在
     os.makedirs(dst_dir, exist_ok=True)
 
@@ -70,8 +72,7 @@ def copy_files_with_prefix(source_folder, destination_folder, prefixes):
     wait_copy_file = [os.path.join(source_folder, s) for s in wait_copy_file]
     multi_thread_copy(wait_copy_file, destination_folder)
 
-
-if __name__ == '__main__':
+def main(argv):
     json_file_path = '.\\arena_000_int\\level.SCNE'  # JSON 文件路径
     source_folder_path = '.\\arena_000_int'  # 源文件夹路径
     destination_folder_path = '.\\copy'  # 目标文件夹路径
@@ -98,3 +99,7 @@ if __name__ == '__main__':
     print(extracted_values)
 
     copy_files_with_prefix(source_folder_path, destination_folder_path, extracted_values)
+
+
+if __name__ == '__main__':
+    main(sys.argv)
